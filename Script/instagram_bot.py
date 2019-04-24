@@ -5,6 +5,7 @@
 #------------------------------------#
 
 # User information
+chromedriver_path = "YOUR_PATH_TO_CHROMEDRIVER.EXE"
 username = "YOUR_INSTAGRAM_USERNAME"
 password = "YOUR_INSTAGRAM_PASSWORD"
 popular_hashtag = "#SOME_HASHTAG"       #Example: '#likeforlike'
@@ -25,7 +26,6 @@ comment_list.append("Great shot")
 comment_list.append("Nice!!! :)")
 comment_list.append("I like your page!")
 comment_list.append("great stuff")
-
 
 #------------------------------------------------------------------------------#
 #                  DO NOT EDIT ANYTHING BELOW THIS STATEMENT!                  #
@@ -54,7 +54,6 @@ def FollowBasedOnUsername(browser, famous_account_name, number_of_follows):
         url = 'https://www.instagram.com/{0}/'.format(username)
         following_list.append(url)
         num_followed += 1
-
     return None
 
 #------------------------------------------------------------------------------#
@@ -86,18 +85,6 @@ def Comment(browser, comment_list):
     comment_section.click()
     print(random_number)
     comment_section.send_keys(comment_list[random_number])
-
-    ##url = "%smedia/%s/comments" % (base_url, media_id)
-    """
-    all_forms = browser.find_elements_by_tag_name('form')
-    print(len(all_forms))
-    for form in all_forms:
-        try:
-            browser.send_keys(comment_list[random_number])
-        except:
-            print('Failed to send comment. Trying again...')
-    """
-    #browser.send_keys(Keys.ENTER)
     return None
 
 #------------------------------------------------------------------------------#
@@ -136,7 +123,6 @@ def LikeBasedOnHashtag(browser, like_number, commenting, comment_list):
             sleep(1)
         except:
             print("Issue encountered while scrolling to next image...")
-
         number_of_likes += 1
         like_number -= 1
 
@@ -147,7 +133,7 @@ def LikeBasedOnHashtag(browser, like_number, commenting, comment_list):
 
 
 # Navigates to Instagram
-browser = webdriver.Chrome('C:/Users/turgec/OneDrive/Projects/chromedriver.exe')
+browser = webdriver.Chrome(chromedriver_path)
 browser.get('https://www.instagram.com')
 sleep(1)
 
