@@ -27,10 +27,6 @@ comment_list.append("Nice!!! :)")
 comment_list.append("I like your page!")
 comment_list.append("great stuff")
 
-#------------------------------------------------------------------------------#
-#                  DO NOT EDIT ANYTHING BELOW THIS STATEMENT!                  #
-#------------------------------------------------------------------------------#
-
 from time import sleep
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
