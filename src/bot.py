@@ -1,23 +1,30 @@
+
 #------------------------------------#
 #            --- ---- ---            #
 #       Instagram Scraping Bot       #
 #            --- ---- ---            #
 #------------------------------------#
 
-# User information
-chromedriver_path = "YOUR_PATH_TO_CHROMEDRIVER.EXE"
-username = "YOUR_INSTAGRAM_USERNAME"
-password = "YOUR_INSTAGRAM_PASSWORD"
-popular_hashtag = "#SOME_HASHTAG"       #Example: '#likeforlike'
-famous_account_name = "SOME_USERNAME"   #Example: 'cristiano'
-number_of_follows = 50
-like_number = 250
+import argparse
+import random
+import sys
+from time import sleep
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 
-# Make mode(s) equal to "on" for bot to activate given mode
-# DISCLAIMER: only one mode can be activated at a time...
-like_mode = "on"
-follow_mode = "off"
-comment_mode ="off"
+# User information
+CHROMEDRIVER_PATH = r"C:\path\to\chromedriver.exe"
+USERNAME = "hello.world"
+PASSWORD = "YOUR_INSTAGRAM_PASSWORD"
+HASHTAG = "#yourhashtaghere"            # Example: "#likeforlike"
+TARGET_ACCOUNT_NAME = "ccreyes"         # Example: "cristiano"
+NUMBER_OF_FOLLOWS = 50
+NUMBER_OF_LIKES = 250
+
+# Bot mode constants
+LIKE_AND_COMMENT = 0
+LIKE = 1
+FOLLOW = 2
 
 # Create a list to be filled with random comments
 comment_list = []
@@ -27,57 +34,54 @@ comment_list.append("Nice!!! :)")
 comment_list.append("I like your page!")
 comment_list.append("great stuff")
 
-from time import sleep
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-import random
+#------------------------------------------------------------------------------#
+
+def parseArgs():
+    action = None
+    if follow is not None and comment is not None:
+        print("Invalid argument list <cannot have 'comment' mode with 'follow' mode on>")
+        sys.exit(return_code)
+    elif follow is not None and like is not None:
+        print("Invalid argument list <cannot have 'follow' mode with 'like' mode on>")
+        sys.exit(return_code)
+    elif like and comment:
+        action = LIKE_AND_COMMENT
+    elif like:
+        action = LIKE
+    elif follow:
+        action = FOLLOW
+    else:
+        print("Invalid argument selection")
+        sys.exit(return_code)
+    return action
 
 #------------------------------------------------------------------------------#
 
-def FollowBasedOnUsername(browser, famous_account_name, number_of_follows):
-
-    # Sequence of code reaches account and goes to following list
-    search = browser.find_element_by_xpath("//input[@placeholder='Search']")
-    search.send_keys(famous_account_name)
-    browser.find_element_by_xpath('//*[@id="react-root"]/section/main/article/header/section/ul/li[2]/a').click()
-
-    # Follow every account and add the account url's to a list for unfollowing
-    following_list_urls = []
-    num_followed = 0
-
-    while (num_followed < number_of_follows):
-        username = browser.find_element_by_xpath('//*[@id="react-root"]/section/main/article/header/section/div[1]/h1')
-        url = 'https://www.instagram.com/{0}/'.format(username)
-        following_list.append(url)
-        num_followed += 1
-    return None
+def login(driver):
+    print("Beginning login with credentials: [{}] [{}]".format(USERNAME, PASSWORD))
+    driver.find_element_by_xpath("//input[@name='username']").send_keys(USERNAME)
+    driver.find_element_by_xpath("//input[@name='password']").send_keys(PASSWORD)
+    driver.find_element_by_xpath("//button[contains(.,'Log in')]").click()
+    print("Login was successful")
+    sleep(10)
 
 #------------------------------------------------------------------------------#
 
-def FollowBasedOnHashtag(browser, hashtag, number_of_follows):
-
-    # Creates list to hold usernames
-    following_list = []
-
-    # Sequence of code to reach hashtag
-    search = browser.find_element_by_xpath("//input[@placeholder='Search']")
-    search.send_keys(hashtag)
-    sleep(2)
-    search.send_keys(Keys.DOWN, Keys.ENTER)
-    sleep(2)
-
-    browser.find_element_by_xpath('/html/body/div[3]/div/div[2]/div/article/header/div[2]/div[1]/div[2]/span[2]/button').click()
-    username = browser.find_element_by_xpath()
-    following_list.append()
-    return None
+def buildDriver():
+    driver = webdriver.Chrome(CHROMEDRIVER_PATH)
+    driver.implicitly_wait(15)
+    driver.get("https://www.instagram.com")
+    sleep(5)
+    return driver
 
 #------------------------------------------------------------------------------#
 
-def Comment(browser, comment_list):
+def performLikeAndComment(driver):
+    driver.find_element_by_xpath("//input[@type='text' and @placeholder='Search']").send_keys(HASHTAG)
 
     # Generates a random comment from list in beginning of file
     random_number = random.randint(0, len(comment_list))
-    comment_section = browser.find_element_by_css_selector('textarea')
+    comment_section = driver.find_element_by_css_selector('textarea')
     comment_section.click()
     print(random_number)
     comment_section.send_keys(comment_list[random_number])
@@ -85,7 +89,7 @@ def Comment(browser, comment_list):
 
 #------------------------------------------------------------------------------#
 
-def LikeBasedOnHashtag(browser, like_number, commenting, comment_list):
+def performLike(driver):
 
     # Accesses first post that comes up on the feed
     browser.find_element_by_xpath('//*[@id="react-root"]/section/main/article/div[1]/div/div/div[1]/div[1]/a/div').click()
@@ -125,48 +129,72 @@ def LikeBasedOnHashtag(browser, like_number, commenting, comment_list):
     print(number_of_likes, 'picture(s) were liked.')
     return None
 
+
 #------------------------------------------------------------------------------#
 
+def performFollow(driver):
+    # Sequence of code reaches account and goes to following list
+    search = browser.find_element_by_xpath("//input[@placeholder='Search']")
+    search.send_keys(famous_account_name)
+    browser.find_element_by_xpath('//*[@id="react-root"]/section/main/article/header/section/ul/li[2]/a').click()
 
-# Navigates to Instagram
-browser = webdriver.Chrome(chromedriver_path)
-browser.get('https://www.instagram.com')
-sleep(1)
+    # Follow every account and add the account url's to a list for unfollowing
+    following_list_urls = []
+    num_followed = 0
 
+    while (num_followed < number_of_follows):
+        username = browser.find_element_by_xpath('//*[@id="react-root"]/section/main/article/header/section/div[1]/h1')
+        url = 'https://www.instagram.com/{0}/'.format(username)
+        following_list.append(url)
+        num_followed += 1
+    return None
 
-# Goes to login page
-login_elem = browser.find_element_by_xpath('//article/div/div/p/a[text()="Log in"]')
-login_elem.click()
+#------------------------------------------------------------------------------#
 
+def perform(driver, action):
+    login(driver)
+    search_value = HASHTAG if action == LIKE or action == LIKE_AND_COMMENT else TARGET_ACCOUNT_NAME
+    search = driver.find_element_by_xpath("//input[@placeholder='Search']")
+    search.send_keys(search_value, Keys.DOWN, Keys.ENTER)
+    print("Finished search for {}".format(search_value))
+    if action == LIKE_AND_COMMENT:
+        print("Beginning LIKE AND COMMENT mode")
+        performLikeAndComment()
+    elif action == LIKE:
+        print("Beginning LIKE mode")
+        performLike()
+    else:
+        print("Beginning FOLLOW mode")
+        performFollow()
+    return 0
 
-# Inputs username and password into login and logs onto account
-browser.find_element_by_xpath('//input[@name="username"]').send_keys(username)
-browser.find_element_by_xpath('//input[@name="password"]').send_keys(password)
-browser.find_element_by_xpath("//button[contains(.,'Log in')]").click()
-print("\nLogin to @", username, '\'s account was successful.', sep='')
-sleep(2)
+#------------------------------------------------------------------------------#
 
+if __name__ == "__main__":
+    return_code = -1
 
-# Enters popular hashtag in searchbar and hits enter, scrolls down to hit enter
-search = browser.find_element_by_xpath("//input[@placeholder='Search']")
-search.send_keys(popular_hashtag)
-sleep(2)
-search.send_keys(Keys.DOWN, Keys.ENTER)
-print('Program reached hashtag page.\n')
-sleep(2)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-f", "--follow",   help="have bot follow users following {}".format(TARGET_ACCOUNT_NAME),  default=None)
+    parser.add_argument("-l", "--like",     help="have bot like posts under #{}".format(HASHTAG),                   default=None)
+    parser.add_argument("-c", "--comment",  help="optional argument used with like mode",                           default=None)
+    parser.add_argument("--debug", help="print webdriver.page_source after selenium failure",                       default=None)
+    args = parser.parse_args()
+    follow = getattr(args, "follow")
+    like = getattr(args, "like")
+    comment = getattr(args, "comment")
+    print("Follow\t\t[{}]\nLike\t\t[{}]\nComment\t\t[{}]".format(follow, like, comment))
 
-# Function calls determined from user input at beginning of file
-if like_mode == "on" and comment_mode == "off":
-    LikeBasedOnHashtag(browser, like_number, "off", comment_list)
-elif (like_mode and comment_mode) == "on":
-    LikeBasedOnHashtag(browser, like_number, "on", comment_list)
-elif follow_mode == "on" and ((like_mode and comment_mode) == "off"):
-    FollowBasedOnUsername(browser, famous_account_name, number_of_follows)
-else:
-    print("No mode specified.")
-
-# Clean exit for driver
-##browser.close()
-print('\n|' + "-" * 42 + '|')
-print("| Browser window closed. Program complete! |")
-print('|' + "-" * 42 + '|')
+    try:
+        action = parseArgs()
+        driver = buildDriver()
+        return_code = perform(driver, action)
+    except Exception as e:
+        print("An exception occurred: {}".format(e))
+        if args.debug:
+            print(driver.page_source)
+    finally:
+        if driver:
+            driver.quit()
+            print("Safely closed chromedriver")
+    print("Completed")
+    sys.exit(return_code)
