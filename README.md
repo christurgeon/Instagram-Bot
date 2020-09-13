@@ -35,4 +35,6 @@ python bot.py follow
 
 ## Notes
 
+Use the optional command line argument ```--debug DEBUG``` to print webdriver page source code to help with debugging in the case that say an XPath becomes invalid.
+
 If the program breaks while trying to navigate Instagram, then most likely Instagram has updated their website and the selection of web elements from DOM needs to be changed. Please email me at **turgeonchris3@gmail.com** if you would like me to take a look and patch the bug.
