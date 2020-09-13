@@ -1,4 +1,4 @@
-# About and Configuring Tips
+# Instagram Crawler
 
 ## Summary 
 
@@ -16,7 +16,7 @@ Next make sure that you have ```chromedriver.exe``` downloaded and set the path 
 
 ## Like Mode
 
-This mode works by searching all posts containing the hashtag stored in the variable **HASHTAG** and liking each post up to the number specified. Optionally, this mode can be used with a comment mode to drop in a random comment.
+This mode works by searching all posts containing the hashtag stored in the variable **HASHTAG** and liking each post up to the number specified. Optionally, this mode can be used with a comment mode to drop in a random comment from a user-specified list.
 
 Only allowing likes:
 ```
