@@ -1,5 +1,11 @@
 # About and Configuring Tips
 
+## Summary 
+
+This Instagram bot uses Selenium chromedriver to interact with webelements from your browser. It crawls through user posts or users following a certain account and can follow, like, and comment on posts that come up. Note that this bot has no malicious intent. Use is at your own risk and be aware of Instagram's bot and automation guidelines.
+
+## Setup
+
 Before attempting to run the bot, make sure that you have the necessary libraries installed.
 
 ```
