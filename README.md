@@ -10,7 +10,6 @@ Before attempting to run the bot, make sure that you have the necessary librarie
 
 ```
 pip install selenium
-pip install argparse
 ```
 Next make sure that you have ```chromedriver.exe``` downloaded and set the path to this executable in the variable **CHROMEDRIVER_PATH**. You can find compatible chromedriver versions for your Google chrome application [here](https://chromedriver.chromium.org/downloads).
 
