@@ -1,4 +1,4 @@
-# Instagram-Crawler
+# About and Configuring Tips
 
 Before attempting to run the bot, make sure that you have the necessary libraries installed.
 
