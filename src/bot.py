@@ -12,11 +12,14 @@ from time import sleep
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
-# User information
-CHROMEDRIVER_PATH = r"C:\path\to\chromedriver.exe"
-USERNAME = "hello.world"
-PASSWORD = "YOUR_INSTAGRAM_PASSWORD"
-HASHTAG = "#yourhashtaghere"            # Example: "#likeforlike"
+# Chrome information
+CHROMEDRIVER_PATH = r"C:\Users\turgec\AppData\Local\Programs\Python\Python37-32\chromedriver.exe"
+WAIT_TIME = 15
+
+# Instagam information
+USERNAME = "chris.turgeon"
+PASSWORD = "Popicks363!363"
+HASHTAG = "#instagramnyc"               # Example: "#likeforlike"
 TARGET_ACCOUNT_NAME = "ccreyes"         # Example: "cristiano"
 NUMBER_OF_FOLLOWS = 50
 NUMBER_OF_LIKES = 250
@@ -27,12 +30,13 @@ LIKE = 1
 FOLLOW = 2
 
 # Create a list to be filled with random comments
-comment_list = []
-comment_list.append("Fantastic photo. Keep it up! :)")
-comment_list.append("Great shot")
-comment_list.append("Nice!!! :)")
-comment_list.append("I like your page!")
-comment_list.append("great stuff")
+comment_list = [
+     "Fantastic photo. Keep it up! :)"
+    ,"Great shot"
+    ,"Nice!!! :)"
+    ,"I like your page!"
+    ,"great stuff"
+]
 
 #------------------------------------------------------------------------------#
 
@@ -60,16 +64,26 @@ def parseArgs():
 def login(driver):
     print("Beginning login with credentials: [{}] [{}]".format(USERNAME, PASSWORD))
     driver.find_element_by_xpath("//input[@name='username']").send_keys(USERNAME)
-    driver.find_element_by_xpath("//input[@name='password']").send_keys(PASSWORD)
-    driver.find_element_by_xpath("//button[contains(.,'Log in')]").click()
-    print("Login was successful")
-    sleep(10)
+    sleep(3)
+    driver.find_element_by_xpath("//input[@name='password']").send_keys(PASSWORD, Keys.ENTER)
+    sleep(3)
+    try:
+        driver.find_element_by_xpath("//button[@type='button' and text()='Save Info']").click().pause(3)
+    except Exception as e:
+        print("Was not able to find popup to save login information")
+    try:
+        driver.find_element_by_xpath("/html/body/div[4]/div/div/div/div[3]/button[2]").click().pause(3)
+    except Exception as e:
+        print("Did not find pop up to turn on notifications, if you still see one please manually click")
+        print("Sleeping for {} seconds".format(WAIT_TIME))
+        sleep(WAIT_TIME)
+    print("Login was likely successful")
 
 #------------------------------------------------------------------------------#
 
 def buildDriver():
     driver = webdriver.Chrome(CHROMEDRIVER_PATH)
-    driver.implicitly_wait(15)
+    driver.implicitly_wait(WAIT_TIME)
     driver.get("https://www.instagram.com")
     sleep(5)
     return driver
@@ -78,6 +92,7 @@ def buildDriver():
 
 def performLikeAndComment(driver):
     driver.find_element_by_xpath("//input[@type='text' and @placeholder='Search']").send_keys(HASHTAG)
+
 
     # Generates a random comment from list in beginning of file
     random_number = random.randint(0, len(comment_list))
@@ -90,9 +105,10 @@ def performLikeAndComment(driver):
 #------------------------------------------------------------------------------#
 
 def performLike(driver):
+    driver.find_element_by_xpath("//input[@type='text' and @placeholder='Search']").send_keys(HASHTAG)
 
-    # Accesses first post that comes up on the feed
-    browser.find_element_by_xpath('//*[@id="react-root"]/section/main/article/div[1]/div/div/div[1]/div[1]/a/div').click()
+
+    sleep(100)
 
     # Proceeds to second post to begin liking pics to avoid complications
     x = 0
@@ -159,13 +175,13 @@ def perform(driver, action):
     print("Finished search for {}".format(search_value))
     if action == LIKE_AND_COMMENT:
         print("Beginning LIKE AND COMMENT mode")
-        performLikeAndComment()
+        performLikeAndComment(driver)
     elif action == LIKE:
         print("Beginning LIKE mode")
-        performLike()
+        performLike(driver)
     else:
         print("Beginning FOLLOW mode")
-        performFollow()
+        performFollow(driver)
     return 0
 
 #------------------------------------------------------------------------------#
@@ -184,6 +200,7 @@ if __name__ == "__main__":
     comment = getattr(args, "comment")
     print("Follow\t\t[{}]\nLike\t\t[{}]\nComment\t\t[{}]".format(follow, like, comment))
 
+    driver = None
     try:
         action = parseArgs()
         driver = buildDriver()
