@@ -17,8 +17,8 @@ CHROMEDRIVER_PATH = r"C:\Users\turgec\AppData\Local\Programs\Python\Python37-32\
 WAIT_TIME = 15
 
 # Instagam information
-USERNAME = "chris.turgeon"
-PASSWORD = "Popicks363!363"
+USERNAME = "..."
+PASSWORD = "..."
 HASHTAG = "#instagramnyc"               # Example: "#likeforlike"
 TARGET_ACCOUNT_NAME = "ccreyes"         # Example: "cristiano"
 NUMBER_OF_FOLLOWS = 50
