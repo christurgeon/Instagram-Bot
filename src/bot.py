@@ -14,11 +14,10 @@ from selenium.webdriver.common.keys import Keys
 
 # Chrome information
 CHROMEDRIVER_PATH = r"C:\Users\turgec\AppData\Local\Programs\Python\Python37-32\chromedriver.exe"
-WAIT_TIME = 15
 
 # Instagam information
-USERNAME = "..."
-PASSWORD = "..."
+USERNAME = ""
+PASSWORD = ""
 HASHTAG = "#instagramnyc"               # Example: "#likeforlike"
 TARGET_ACCOUNT_NAME = "ccreyes"         # Example: "cristiano"
 NUMBER_OF_FOLLOWS = 50
@@ -64,7 +63,6 @@ def parseArgs():
 def login(driver):
     print("Beginning login with credentials: [{}] [{}]".format(USERNAME, PASSWORD))
     driver.find_element_by_xpath("//input[@name='username']").send_keys(USERNAME)
-    sleep(3)
     driver.find_element_by_xpath("//input[@name='password']").send_keys(PASSWORD, Keys.ENTER)
     sleep(3)
     try:
@@ -75,24 +73,21 @@ def login(driver):
         driver.find_element_by_xpath("/html/body/div[4]/div/div/div/div[3]/button[2]").click().pause(3)
     except Exception as e:
         print("Did not find pop up to turn on notifications, if you still see one please manually click")
-        print("Sleeping for {} seconds".format(WAIT_TIME))
-        sleep(WAIT_TIME)
+        sleep(5)
     print("Login was likely successful")
 
 #------------------------------------------------------------------------------#
 
 def buildDriver():
     driver = webdriver.Chrome(CHROMEDRIVER_PATH)
-    driver.implicitly_wait(WAIT_TIME)
+    driver.implicitly_wait(15)
     driver.get("https://www.instagram.com")
-    sleep(5)
     return driver
 
 #------------------------------------------------------------------------------#
 
 def performLikeAndComment(driver):
     driver.find_element_by_xpath("//input[@type='text' and @placeholder='Search']").send_keys(HASHTAG)
-
 
     # Generates a random comment from list in beginning of file
     random_number = random.randint(0, len(comment_list))
@@ -105,10 +100,25 @@ def performLikeAndComment(driver):
 #------------------------------------------------------------------------------#
 
 def performLike(driver):
-    driver.find_element_by_xpath("//input[@type='text' and @placeholder='Search']").send_keys(HASHTAG)
+    search_bar = driver.find_element_by_xpath("//input[@type='text' and @placeholder='Search']")
+    search_bar.clear()
+    search_bar.send_keys(HASHTAG)
+    sleep(3)
+    search_bar.send_keys(Keys.TAB, Keys.TAB, Keys.ENTER)
 
+    print("Reached page")
+    sleep(10)
 
-    sleep(100)
+    if HASHTAG + " hashtag" not in driver.title:
+        raise Exception("performLike() hashtag page could not be reached, current page: {}".format(driver.title))
+
+    print("well then")
+
+    a = '/html/body/div[1]/section/main/article/div[1]/div/div/div[1]/div[1]/a/div/div[1]'
+    b = '//*[@id="react-root"]/section/main/article/div[1]/div/div/div[1]/div[1]/a/div/div[1]'
+
+    driver.find_element_by_xpath(a).click()
+
 
     # Proceeds to second post to begin liking pics to avoid complications
     x = 0
@@ -169,7 +179,7 @@ def performFollow(driver):
 
 def perform(driver, action):
     login(driver)
-    search_value = HASHTAG if action == LIKE or action == LIKE_AND_COMMENT else TARGET_ACCOUNT_NAME
+    search_value = HASHTAG if action == LIKE or action == LIKE_AND_COMMENT else FOLLOW
     search = driver.find_element_by_xpath("//input[@placeholder='Search']")
     search.send_keys(search_value, Keys.DOWN, Keys.ENTER)
     print("Finished search for {}".format(search_value))
@@ -179,9 +189,12 @@ def perform(driver, action):
     elif action == LIKE:
         print("Beginning LIKE mode")
         performLike(driver)
-    else:
+    elif action == FOLLOW:
         print("Beginning FOLLOW mode")
         performFollow(driver)
+    else:
+        print("Unknown action...")
+        return -1
     return 0
 
 #------------------------------------------------------------------------------#
@@ -198,6 +211,8 @@ if __name__ == "__main__":
     follow = getattr(args, "follow")
     like = getattr(args, "like")
     comment = getattr(args, "comment")
+    print("==================================================")
+    print("START")
     print("Follow\t\t[{}]\nLike\t\t[{}]\nComment\t\t[{}]".format(follow, like, comment))
 
     driver = None
@@ -213,5 +228,6 @@ if __name__ == "__main__":
         if driver:
             driver.quit()
             print("Safely closed chromedriver")
-    print("Completed")
+
+    print("END retVal = {}".format(return_code))
     sys.exit(return_code)
